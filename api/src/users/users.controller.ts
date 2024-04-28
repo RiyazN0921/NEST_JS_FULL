@@ -15,6 +15,7 @@ import { UsersService } from './users.service'
 import { createUserDto, loginDto } from './dto/createUser.dto'
 import { updateUserDto } from './dto/updateUser.dto'
 import mongoose, { Mongoose } from 'mongoose'
+import { JwtAuthGuard } from './guards/jwt.guards'
 
 @Controller('users')
 export class UsersController {
@@ -22,24 +23,25 @@ export class UsersController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  createUser(@Body() createuser: createUserDto) {
-    return this.usersService.createUser(createuser)
+  Signup(@Body() signup: createUserDto) {
+    return this.usersService.createUser(signup)
   }
 
   @Post('login')
   @UsePipes(new ValidationPipe())
-  login(@Body() body: loginDto) {
-    const createUser = this.usersService.login(body)
-    return createUser
+  login(@Body() login: loginDto) {
+    return this.usersService.login(login)
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   getUser() {
     return this.usersService.getUser()
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   async getUserById(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id)
@@ -51,6 +53,8 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe())
   updateUser(@Param('id') id: string, @Body() updateUser: updateUserDto) {
     const isValid = mongoose.Types.ObjectId.isValid(id)
     if (!isValid) throw new HttpException('Invalid ID', 400)
@@ -60,6 +64,8 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe())
   deleteUser(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id)
     if (!isValid) throw new HttpException('Invalid ID', 400)
