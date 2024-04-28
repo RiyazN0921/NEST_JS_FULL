@@ -8,12 +8,18 @@ import {
   UserSettingSchema,
 } from 'src/schemas/usersSettings.schemas'
 import { JwtModule } from '@nestjs/jwt'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: 'JWT_SECRETEKEY',
-      signOptions: { expiresIn: '1d' },
+    ConfigModule.forRoot(),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRETE'), // Retrieve JWT secret key from environment variables
+        signOptions: { expiresIn: '1d' },
+      }),
+      inject: [ConfigService],
     }),
     MongooseModule.forFeature([
       { name: Users.name, schema: UserSchema },
