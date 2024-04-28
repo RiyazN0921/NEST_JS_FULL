@@ -39,3 +39,13 @@ export class createUserDto {
     @Type(() => userSettingsDto)
     settings?: userSettingsDto
 }
+
+export class loginDto {
+    @IsNotEmpty()
+    @IsString()
+    email: string
+
+    @IsNotEmpty()
+    @IsString()
+    password: string
+}
